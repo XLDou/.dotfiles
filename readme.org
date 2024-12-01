@@ -1,0 +1,3 @@
+* Instrucation
+ 1. Install stow
+ 2. Run =stow --no-folding -vt ~ *dir_name*=

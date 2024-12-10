@@ -11,8 +11,31 @@
 (package-refresh-contents)
 
 (unless (package-installed-p 'use-package)
-  (package-refresh-contends)
+  (package-refresh-contents)
   (package-install 'use-package))
+
+;; evil mode
+(unless (package-installed-p 'evil)
+  (package-refresh-contents)
+  (package-install 'evil))
+(require 'evil)
+(evil-mode 1)
+
+;; color scheme
+(load-theme 'gruvbox-dark-medium t)
+
+;; autocomplete
+(unless (package-installed-p 'company)
+  (package-install 'company))
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
+(add-to-list 'company-backend 'company-etags)
+
+;; color line
+(setq-default fill-column 80)
+(global-display-fill-column-indicator-mode 1)
+(set-face-attribute 'fill-column-indicator nil :foreground "red")
+
 
 (use-package try
   :ensure t)
@@ -21,6 +44,7 @@
   :ensure t
   :config (which-key-mode))
 
+;; latex config using auctex and pdf tools
 (use-package tex
   :ensure auctex
   :config
@@ -65,8 +89,7 @@
             '(lambda ()
                (reftex-mode))))
 
-
-
+;; toggle window split
 (defun toggle-window-split ()
   (interactive)
   (if (= (count-windows) 2)
@@ -105,7 +128,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(0blayout which-key try pdf-tools org-bullets gruvbox-theme auctex)))
+   '(company evil 0blayout which-key try pdf-tools org-bullets gruvbox-theme auctex)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

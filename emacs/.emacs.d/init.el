@@ -8,18 +8,41 @@
         ("org" . "http://orgmode.org/elpa/")))
 
 (package-initialize)
-(package-refresh-contents)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
+(unless (package-installed-p 'flyspell-correct)
+  (package-refresh-contents)
+  (package-install 'flyspell-correct))
+
+(unless (package-installed-p 'ivy)
+  (package-refresh-contents)
+  (package-install 'ivy))
+
+;; Enable Ivy mode
+(ivy-mode 1)
+
+;; Minimal configuration
+(setq ivy-use-virtual-buffers t) ; Enable recent files and bookmarks in Ivy
+(setq enable-recursive-minibuffers t) ; Allow minibuffer commands in minibuffer
+
 ;; evil mode
 (unless (package-installed-p 'evil)
   (package-refresh-contents)
   (package-install 'evil))
-(require 'evil)
-(evil-mode 1)
+
+(setq evil-want-keybinding nil)
+(use-package evil
+  :ensure t
+  :config
+  (evil-mode 1))
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
 
 ;; color scheme
 (load-theme 'gruvbox-dark-medium t)
@@ -48,9 +71,6 @@
 (use-package tex
   :ensure auctex
   :config
-
-  ;; Indent items by two spaces.
-  (setq LaTeX-item-indent 0)
   
   (setq TeX-PDF-mode t)
 
@@ -72,7 +92,7 @@
 
   ;; Needed to sync TeX and PDF
   (add-hook 'LaTeX-mode-hook
-            '(lambda ()
+            #'(lambda ()
                (TeX-source-correlate-mode 1)))
 
   (add-hook 'TeX-after-compilation-finished-functions
@@ -82,12 +102,35 @@
   ;; (setq auto-revert-interval 0.5)
 
   (add-hook 'pdf-view-mode-hook
-            (lambda ()
+            #'(lambda ()
               (pdf-view-fit-page-to-window) ))
 
   (add-hook 'LaTeX-mode-hook
-            '(lambda ()
+            #'(lambda ()
                (reftex-mode))))
+;; Eanble Flyspell mode for text files
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+;; Use TeX parsing for Flyspell
+(setq ispell-parser 'tex)
+(setq ispell-dictionary "english")
+;; Ignore math environments
+(setq ispell-skip-region-alist
+      '(("\\$" . "\\$")              ; Inline math
+        ("\\\\\\[" . "\\\\\\]")      ; Display math
+        ("\\\\begin{equation}" . "\\\\end{equation}")
+        ("\\\\begin{align}" . "\\\\end{align}")
+        ("\\\\begin{multline}" . "\\\\end{multline}")))
+
+;; Bind keys for Flyspell corrections in Evil mode
+(require 'flyspell-correct)
+
+;; Set the correction interface (choose one)
+(setq flyspell-correct-interface #'flyspell-correct-ivy)   ;; If using Ivy
+;; (setq flyspell-correct-interface #'flyspell-correct-helm) ;; If using Helm
+;; (setq flyspell-correct-interface #'flyspell-correct-popup) ;; If using Popup Menu
+(define-key evil-normal-state-map (kbd "[s") 'flyspell-correct-wrapper)
+(define-key evil-normal-state-map (kbd "]s") 'flyspell-correct-wrapper)
+
 
 ;; toggle window split
 (defun toggle-window-split ()
@@ -128,7 +171,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(company evil 0blayout which-key try pdf-tools org-bullets gruvbox-theme auctex)))
+   '(flyspell-correct-ivy ivy flyspell-correct evil-collection company evil 0blayout which-key try pdf-tools org-bullets gruvbox-theme auctex)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

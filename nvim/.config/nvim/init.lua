@@ -19,3 +19,5 @@ vim.cmd("set expandtab")
 vim.cmd("set autoindent")
 vim.cmd("set showmatch")
 vim.cmd("map <F6> :setlocal spell! spelllang=en_us<CR>")
+
+require("config.lazy")
